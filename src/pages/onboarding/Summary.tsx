@@ -13,11 +13,22 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { completeOnboarding as completeAuthOnboarding } from '../../store/slices/authSlice';
+import {
+  completeOnboarding,
+  markSubmittedToBackend,
+  BasicInfo,
+  Lifestyle,
+  MedicalHistory,
+} from '../../store/slices/onboardingSlice';
 
 const OnboardingSummary: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const onboardingData = useAppSelector((state) => state.onboarding);
 
-  // In a real app, this data would come from context/state management
+  // In a real app, this data would come from previous onboarding steps
   // This is mock data for demonstration
   const mockUserData = {
     basicInfo: {
@@ -42,9 +53,51 @@ const OnboardingSummary: React.FC = () => {
     },
   };
 
-  const handleComplete = () => {
-    // In a real app, you would finalize the onboarding process here
-    // This might include API calls to save all the collected data
+  // Function to send onboarding data to backend
+  const sendOnboardingDataToBackend = async (data: {
+    basicInfo: BasicInfo;
+    healthGoals: string[];
+    lifestyle: Lifestyle;
+    medicalHistory: MedicalHistory;
+  }) => {
+    try {
+      // This is a placeholder for the actual API call
+      console.log('Sending onboarding data to backend:', data);
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Mark as submitted to backend in Redux
+      dispatch(markSubmittedToBackend());
+
+      return true;
+    } catch (error) {
+      console.error('Error sending onboarding data to backend:', error);
+      return false;
+    }
+  };
+
+  const handleComplete = async () => {
+    // Save onboarding data to Redux
+    dispatch(
+      completeOnboarding({
+        basicInfo: mockUserData.basicInfo as BasicInfo,
+        healthGoals: mockUserData.healthGoals,
+        lifestyle: mockUserData.lifestyle as Lifestyle,
+        medicalHistory: mockUserData.medicalHistory as MedicalHistory,
+      })
+    );
+
+    // Mark onboarding as complete in auth slice
+    dispatch(completeAuthOnboarding());
+
+    // Send data to backend (placeholder)
+    await sendOnboardingDataToBackend({
+      basicInfo: mockUserData.basicInfo as BasicInfo,
+      healthGoals: mockUserData.healthGoals,
+      lifestyle: mockUserData.lifestyle as Lifestyle,
+      medicalHistory: mockUserData.medicalHistory as MedicalHistory,
+    });
 
     // Navigate to the dashboard
     navigate('/dashboard');

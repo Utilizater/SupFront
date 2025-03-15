@@ -1,6 +1,7 @@
 import { store } from './index';
 import { setAuthState } from './slices/authSlice';
 import { setCartState, CartItem } from './slices/cartSlice';
+import { completeOnboarding } from './slices/onboardingSlice';
 
 // Mock user data
 const mockUser = {
@@ -35,13 +36,37 @@ const mockCartItems: CartItem[] = [
   },
 ];
 
+// Mock onboarding data
+const mockOnboardingData = {
+  basicInfo: {
+    name: 'John Doe',
+    age: 35,
+    gender: 'Male',
+    height: '5\'10"',
+    weight: '175 lbs',
+  },
+  healthGoals: ['Weight Loss', 'Energy Boost', 'Better Sleep'],
+  lifestyle: {
+    activityLevel: 'Moderate',
+    sleepHours: 7,
+    stressLevel: 6,
+    diet: 'Omnivore',
+    dietaryRestrictions: 'Lactose intolerant',
+  },
+  medicalHistory: {
+    conditions: ['Hypertension', 'High Cholesterol'],
+    medications: ['Lisinopril', 'Atorvastatin'],
+    supplements: ['Multivitamin', 'Fish Oil'],
+  },
+};
+
 // Initialize store with mock data for development
 export const initializeMockData = () => {
   // Set authentication state
   store.dispatch(
     setAuthState({
       isAuthenticated: true,
-      hasCompletedOnboarding: true,
+      hasCompletedOnboarding: false,
       user: mockUser,
     })
   );
@@ -53,6 +78,16 @@ export const initializeMockData = () => {
       promoCode: '',
       promoDiscount: 0,
       promoCodeApplied: false,
+    })
+  );
+
+  // Set onboarding state
+  store.dispatch(
+    completeOnboarding({
+      basicInfo: mockOnboardingData.basicInfo,
+      healthGoals: mockOnboardingData.healthGoals,
+      lifestyle: mockOnboardingData.lifestyle,
+      medicalHistory: mockOnboardingData.medicalHistory,
     })
   );
 };
