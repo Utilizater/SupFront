@@ -6,6 +6,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 // Import reducers
 import authReducer from './slices/authSlice';
 import cartReducer from './slices/cartSlice';
+import onboardingReducer from './slices/onboardingSlice';
 
 // Configure persist options
 const authPersistConfig = {
@@ -20,14 +21,32 @@ const cartPersistConfig = {
   whitelist: ['items', 'promoCode', 'promoDiscount', 'promoCodeApplied'], // persist all cart fields
 };
 
+const onboardingPersistConfig = {
+  key: 'onboarding',
+  storage,
+  whitelist: [
+    'basicInfo',
+    'healthGoals',
+    'lifestyle',
+    'medicalHistory',
+    'isComplete',
+    'isSubmittedToBackend',
+  ], // persist all onboarding fields
+};
+
 // Create persisted reducers
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedCartReducer = persistReducer(cartPersistConfig, cartReducer);
+const persistedOnboardingReducer = persistReducer(
+  onboardingPersistConfig,
+  onboardingReducer
+);
 
 // Combine reducers
 const rootReducer = combineReducers({
   auth: persistedAuthReducer,
   cart: persistedCartReducer,
+  onboarding: persistedOnboardingReducer,
 });
 
 // Create store
