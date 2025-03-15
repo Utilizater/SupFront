@@ -150,21 +150,24 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout, onToggleSidebar }) => {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}>
               <MenuItem
-                component={RouterLink}
-                to='/profile'
-                onClick={handleMenuClose}>
+                onClick={() => {
+                  handleMenuClose();
+                  window.location.href = '/profile';
+                }}>
                 Profile
               </MenuItem>
               <MenuItem
-                component={RouterLink}
-                to='/profile/orders'
-                onClick={handleMenuClose}>
+                onClick={() => {
+                  handleMenuClose();
+                  window.location.href = '/profile/orders';
+                }}>
                 Orders
               </MenuItem>
               <MenuItem
-                component={RouterLink}
-                to='/profile/recommendations'
-                onClick={handleMenuClose}>
+                onClick={() => {
+                  handleMenuClose();
+                  window.location.href = '/profile/recommendations';
+                }}>
                 Saved Recommendations
               </MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
