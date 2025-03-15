@@ -1,4 +1,13 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store';
+import {
+  updateQuantity,
+  removeItem,
+  applyPromoCode,
+  clearPromoCode,
+  selectCartTotal,
+} from '../../store/slices/cartSlice';
 import {
   Box,
   Typography,
@@ -29,58 +38,29 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-// Mock cart data
-const mockCartItems = [
-  {
-    id: '1',
-    name: 'Energy & Focus Pack',
-    description:
-      'Boost your energy levels and mental clarity with this carefully formulated supplement pack.',
-    price: 89.99,
-    quantity: 1,
-    imageUrl:
-      'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    name: 'Gut Health Essentials',
-    description:
-      'Support your digestive system and microbiome with this comprehensive gut health pack.',
-    price: 79.99,
-    quantity: 2,
-    imageUrl:
-      'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-  },
-];
-
 const Cart: React.FC = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(mockCartItems);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoCodeApplied, setPromoCodeApplied] = useState(false);
-  const [promoDiscount, setPromoDiscount] = useState(0);
+  const dispatch = useDispatch();
+
+  // Get cart items and promo code details from Redux
+  const { items: cartItems } = useSelector((state: RootState) => state.cart);
+  const { promoCode, promoDiscount, promoCodeApplied } = useSelector(
+    (state: RootState) => state.cart
+  );
+
+  // Get cart totals from selector
+  const { subtotal, shipping, tax, total } = useSelector(selectCartTotal);
+
+  const [localPromoCode, setLocalPromoCode] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  // Calculate cart totals
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  const shipping = subtotal > 100 ? 0 : 5.99;
-  const tax = subtotal * 0.07; // 7% tax rate
-  const total = subtotal + shipping + tax - promoDiscount;
-
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
 
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    dispatch(updateQuantity({ id: itemId, quantity: newQuantity }));
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -90,7 +70,7 @@ const Cart: React.FC = () => {
 
   const handleDeleteConfirm = () => {
     if (itemToDelete) {
-      setCartItems(cartItems.filter((item) => item.id !== itemToDelete));
+      dispatch(removeItem(itemToDelete));
       setSnackbarMessage('Item removed from cart');
       setSnackbarOpen(true);
     }
@@ -105,10 +85,9 @@ const Cart: React.FC = () => {
 
   const handleApplyPromoCode = () => {
     // In a real app, you would validate the promo code with your backend
-    if (promoCode.toUpperCase() === 'SAVE20') {
+    if (localPromoCode.toUpperCase() === 'SAVE20') {
       const discount = subtotal * 0.2; // 20% discount
-      setPromoDiscount(discount);
-      setPromoCodeApplied(true);
+      dispatch(applyPromoCode({ code: localPromoCode, discount }));
       setSnackbarMessage('Promo code applied successfully!');
       setSnackbarOpen(true);
     } else {
@@ -118,9 +97,8 @@ const Cart: React.FC = () => {
   };
 
   const handleClearPromoCode = () => {
-    setPromoCode('');
-    setPromoDiscount(0);
-    setPromoCodeApplied(false);
+    setLocalPromoCode('');
+    dispatch(clearPromoCode());
   };
 
   const handleCheckout = () => {
@@ -364,9 +342,9 @@ const Cart: React.FC = () => {
                     size='small'
                     label='Enter code'
                     variant='outlined'
-                    value={promoCode}
+                    value={localPromoCode}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPromoCode(e.target.value)
+                      setLocalPromoCode(e.target.value)
                     }
                     disabled={promoCodeApplied}
                     fullWidth
@@ -384,7 +362,7 @@ const Cart: React.FC = () => {
                     <Button
                       variant='outlined'
                       onClick={handleApplyPromoCode}
-                      disabled={!promoCode.trim()}>
+                      disabled={!localPromoCode.trim()}>
                       Apply
                     </Button>
                   )}

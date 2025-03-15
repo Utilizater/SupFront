@@ -18,24 +18,22 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 interface NavbarProps {
-  isAuthenticated?: boolean;
-  user?: {
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
-  } | null;
   onLogout?: () => void;
   onToggleSidebar?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({
-  isAuthenticated = false,
-  user = null,
-  onLogout,
-  onToggleSidebar,
-}) => {
+const Navbar: React.FC<NavbarProps> = ({ onLogout, onToggleSidebar }) => {
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const { items } = useSelector((state: RootState) => state.cart);
+
+  // Calculate total items in cart
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -106,7 +104,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <IconButton color='inherit' component={RouterLink} to='/cart'>
-                <Badge badgeContent={3} color='error'>
+                <Badge badgeContent={cartItemCount} color='error'>
                   <ShoppingCartIcon />
                 </Badge>
               </IconButton>

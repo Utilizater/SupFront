@@ -1,5 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
 import OnboardingLayout from '../layouts/OnboardingLayout';
@@ -50,13 +52,14 @@ const Loader = () => (
   </div>
 );
 
-// Mock authentication for demonstration
-// In a real app, this would come from a context or state management
-const isAuthenticated = true; //TO DO!!
-const hasCompletedOnboarding = true; //TO DO!!
-
 // Route guards
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, hasCompletedOnboarding } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  console.log('hasCompletedOnboarding', hasCompletedOnboarding);
+
   if (!isAuthenticated) {
     return <Navigate to='/login' />;
   }
@@ -69,6 +72,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, hasCompletedOnboarding } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   if (!isAuthenticated) {
     return <Navigate to='/login' />;
   }
@@ -81,6 +88,10 @@ const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, hasCompletedOnboarding } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   if (isAuthenticated && hasCompletedOnboarding) {
     return <Navigate to='/dashboard' />;
   }
@@ -174,7 +185,7 @@ const AppRoutes = () => {
         </Route>
 
         {/* Protected Routes */}
-        <Route element={<MainLayout isAuthenticated={isAuthenticated} />}>
+        <Route element={<MainLayout />}>
           <Route
             path='/dashboard'
             element={
