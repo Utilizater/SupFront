@@ -1,0 +1,11 @@
+declare module '@mui/material/styles';
+declare module '@mui/material';
+declare module '@mui/icons-material';
+declare module '@mui/icons-material/*';
+declare module '@emotion/react';
+declare module '@emotion/styled';
+declare module 'react-router-dom';
+declare module '@mui/x-date-pickers/DatePicker';
+declare module '@mui/x-date-pickers/LocalizationProvider';
+declare module '@mui/x-date-pickers/AdapterDateFns';
+declare module 'date-fns';
